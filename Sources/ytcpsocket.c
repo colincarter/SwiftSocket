@@ -76,8 +76,8 @@ int ytcpsocket_connect(const char *host, int port, int timeout) {
     struct timeval  tvSelect;
     FD_ZERO(&fdwrite);
     FD_SET(sockfd, &fdwrite);
-    tvSelect.tv_sec = timeout;
-    tvSelect.tv_usec = 0;
+    tvSelect.tv_sec = 0;
+    tvSelect.tv_usec = timeout;
   
     int retval = select(sockfd + 1, NULL, &fdwrite, NULL, &tvSelect);
     if (retval < 0) {
