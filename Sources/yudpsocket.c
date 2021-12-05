@@ -73,7 +73,12 @@ int yudpsocket_server(const char *address, int port) {
     }
 }
 
-int yudpsocket_recive(int socket_fd, char *outdata, int expted_len, char *remoteip, int *remoteport) {
+int yudpsocket_recive(int socket_fd, char *outdata, int expted_len, char *remoteip, int *remoteport, int timeout_us) {
+    struct timeval read_timeout;
+    read_timeout.tv_sec = 0;
+    read_timeout.tv_usec = timeout_us;
+    setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, &read_timeout, sizeof read_timeout);
+
     struct sockaddr_in cli_addr;
     socklen_t clilen = sizeof(cli_addr);
     memset(&cli_addr, 0x0, sizeof(struct sockaddr_in));

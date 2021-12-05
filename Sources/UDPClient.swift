@@ -31,7 +31,7 @@
 import Foundation
 
 @_silgen_name("yudpsocket_server") func c_yudpsocket_server(_ host:UnsafePointer<Int8>,port:Int32) -> Int32
-@_silgen_name("yudpsocket_recive") func c_yudpsocket_recive(_ fd:Int32,buff:UnsafePointer<Byte>,len:Int32,ip:UnsafePointer<Int8>,port:UnsafePointer<Int32>) -> Int32
+@_silgen_name("yudpsocket_recive") func c_yudpsocket_recive(_ fd:Int32,buff:UnsafePointer<Byte>,len:Int32,ip:UnsafePointer<Int8>,port:UnsafePointer<Int32>,timeout_us:Int32) -> Int32
 @_silgen_name("yudpsocket_close") func c_yudpsocket_close(_ fd:Int32) -> Int32
 @_silgen_name("yudpsocket_client") func c_yudpsocket_client() -> Int32
 @_silgen_name("yudpsocket_get_server_ip") func c_yudpsocket_get_server_ip(_ host:UnsafePointer<Int8>,ip:UnsafePointer<Int8>) -> Int32
@@ -112,14 +112,14 @@ open class UDPClient: Socket {
     }
     
     //TODO add multycast and boardcast
-    open func recv(_ expectlen: Int) -> ([Byte]?, String, Int) {
+    open func recv(_ expectlen: Int, _ timeout_us: Int) -> ([Byte]?, String, Int) {
         guard let fd = self.fd else {
             return (nil, "no ip", 0)
         }
         let buff: [Byte] = [Byte](repeating: 0x0, count: expectlen)
         var remoteipbuff: [Int8] = [Int8](repeating: 0x0, count: 16)
         var remoteport: Int32 = 0
-        let readLen: Int32 = c_yudpsocket_recive(fd, buff: buff, len: Int32(expectlen), ip: &remoteipbuff, port: &remoteport)
+        let readLen: Int32 = c_yudpsocket_recive(fd, buff: buff, len: Int32(expectlen), ip: &remoteipbuff, port: &remoteport, timeout_us: timeout_us)
         let port: Int = Int(remoteport)
         let address = String(cString: remoteipbuff, encoding: String.Encoding.utf8) ?? ""
         
